@@ -1,0 +1,32 @@
+{
+  "name": "chainproof-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ChainProof AI — IP ownership verification with blockchain, IPFS, and AI similarity detection",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "blockchain"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "dev:all": "concurrently -n chain,backend,frontend -c yellow,blue,green \"npm run node -w blockchain\" \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "dev:ai": "cd services/ai-similarity && python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000",
+    "dev:stack": "concurrently -n ai,backend,frontend -c magenta,blue,green \"npm run dev:ai\" \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "build": "npm run build -w blockchain && npm run build -w frontend",
+    "start": "npm run start -w backend",
+    "deploy:contracts": "npm run deploy -w blockchain",
+    "lint": "npm run lint -w frontend && npm run lint -w backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "mongodb": "^7.2.0"
+  }
+}

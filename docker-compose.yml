@@ -1,0 +1,65 @@
+services:
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: chainproof
+
+  ai-similarity:
+    build:
+      context: ./services/ai-similarity
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      AI_MODEL_NAME: all-MiniLM-L6-v2
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      AI_SERVICE_URL: http://ai-similarity:8000
+    depends_on:
+      - mongodb
+      - ai-similarity
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/generated:/app/generated
+      - ./backend/src/config/contract-address.json:/app/src/config/contract-address.json:ro
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  hardhat:
+    profiles: ["chain"]
+    image: node:22-alpine
+    working_dir: /app/blockchain
+    command: sh -c "npm install && npx hardhat node --hostname 0.0.0.0"
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./blockchain:/app/blockchain
+      - ./package.json:/app/package.json
+      - chain_modules:/app/node_modules
+
+volumes:
+  mongodb_data:
+  chain_modules:

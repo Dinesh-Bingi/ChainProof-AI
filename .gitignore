@@ -1,0 +1,28 @@
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.local
+**/secrets/
+*firebase*adminsdk*.json
+*.log
+.DS_Store
+Thumbs.db
+
+# Hardhat
+blockchain/cache/
+blockchain/artifacts/
+blockchain/typechain-types/
+
+# Vite
+frontend/dist/
+
+# Uploads & generated certs
+backend/uploads/
+backend/generated/
+
+# IDE
+.idea/
+.vscode/
+*.swp
